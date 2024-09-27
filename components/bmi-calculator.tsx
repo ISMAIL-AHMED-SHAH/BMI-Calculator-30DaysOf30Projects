@@ -137,6 +137,9 @@ export default function BmiCalculator() {
           )}
         </CardContent>
       </Card>
+      <div className="mt-6 text-center text-gray-400 font-semibold">
+        Created by Ismail Ahmed Shah
+      </div>
     </div>
   );
 }
