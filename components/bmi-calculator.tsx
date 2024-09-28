@@ -1,9 +1,6 @@
-"use client"; // Enables client-side rendering for this component
+"use client";
 
-// Import necessary hooks from React
 import { useState, ChangeEvent } from "react";
-
-// Import custom UI components from the UI directory
 import {
   Card,
   CardHeader,
@@ -21,32 +18,35 @@ interface BmiResult {
   category: string;
 }
 
-// Default export of the BmiCalculator function
 export default function BmiCalculator() {
   // State hooks for managing height, weight, BMI result, and error message
-  const [height, setHeight] = useState<string>("");
+  const [feet, setFeet] = useState<string>("");
+  const [inches, setInches] = useState<string>("");
   const [weight, setWeight] = useState<string>("");
   const [result, setResult] = useState<BmiResult | null>(null);
   const [error, setError] = useState<string>("");
 
-  // Handler for updating height state on input change
-  const handleHeightChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setHeight(e.target.value);
+  const handleFeetChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    setFeet(e.target.value);
   };
 
-  // Handler for updating weight state on input change
+  const handleInchesChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    setInches(e.target.value);
+  };
+
   const handleWeightChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setWeight(e.target.value);
   };
 
   // Function to calculate the BMI and determine the category
   const calculateBmi = (): void => {
-    if (!height || !weight) {
-      setError("Please enter both height and weight.");
+    if (!feet || !inches || !weight) {
+      setError("Please enter height in feet and inches, and weight.");
       return;
     }
 
-    const heightInMeters = parseFloat(height) / 100;
+    // Convert height from feet and inches to meters
+    const heightInMeters = (parseFloat(feet) * 0.3048) + (parseFloat(inches) * 0.0254);
     if (heightInMeters <= 0) {
       setError("Height must be a positive number.");
       return;
@@ -59,6 +59,7 @@ export default function BmiCalculator() {
     }
 
     const bmiValue = weightInKg / (heightInMeters * heightInMeters);
+
     let category = "";
 
     if (bmiValue < 18.5) {
@@ -71,43 +72,48 @@ export default function BmiCalculator() {
       category = "Obese";
     }
 
-    setResult({ bmi: bmiValue.toFixed(1), category });
+    setResult({ bmi: bmiValue.toFixed(2), category });
     setError("");
   };
 
   // JSX return statement rendering the BMI calculator UI
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
-      {/* Center the BMI calculator card within the screen */}
       <Card className="w-full max-w-md mx-auto bg-gray-800 border border-gray-600 shadow-lg hover:border-blue-500 hover:shadow-xl transition-all duration-300 ease-in-out rounded-lg p-6">
         <CardHeader className="text-center border-b border-gray-700 pb-4 mb-4">
-          <CardTitle className="text-4xl font-extrabold text-indigo-400">
-            BMI Calculator
-          </CardTitle>
+          <CardTitle className="text-4xl font-extrabold text-indigo-400">BMI Calculator</CardTitle>
           <CardDescription className="text-gray-400">
-            Enter your height and weight to calculate your BMI.
+            Enter your height in feet and inches, and your weight in kg.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Input for height */}
+          {/* Input for height in feet */}
           <div className="grid gap-2">
-            <Label htmlFor="height" className="text-gray-300">
-              Height (cm)
-            </Label>
+            <Label htmlFor="feet" className="text-gray-300">Height (feet)</Label>
             <Input
-              id="height"
+              id="feet"
               type="number"
-              placeholder="Enter your height"
-              value={height}
-              onChange={handleHeightChange}
+              placeholder="Enter feet"
+              value={feet}
+              onChange={handleFeetChange}
+              className="bg-gray-700 text-white placeholder-gray-400 border border-gray-600 rounded-md focus:border-indigo-500 focus:ring-indigo-500 focus:ring-1 transition"
+            />
+          </div>
+          {/* Input for height in inches */}
+          <div className="grid gap-2">
+            <Label htmlFor="inches" className="text-gray-300">Height (inches)</Label>
+            <Input
+              id="inches"
+              type="number"
+              placeholder="Enter inches"
+              value={inches}
+              onChange={handleInchesChange}
               className="bg-gray-700 text-white placeholder-gray-400 border border-gray-600 rounded-md focus:border-indigo-500 focus:ring-indigo-500 focus:ring-1 transition"
             />
           </div>
           {/* Input for weight */}
           <div className="grid gap-2">
-            <Label htmlFor="weight" className="text-gray-300">
-              Weight (kg)
-            </Label>
+            <Label htmlFor="weight" className="text-gray-300">Weight (kg)</Label>
             <Input
               id="weight"
               type="number"
@@ -129,9 +135,7 @@ export default function BmiCalculator() {
           {/* Display BMI result if available */}
           {result && (
             <div className="grid gap-2 text-center">
-              <div className="text-3xl font-bold text-indigo-400">
-                {result.bmi}
-              </div>
+              <div className="text-3xl font-bold text-indigo-400">{result.bmi}</div>
               <div className="text-gray-300">{result.category}</div>
             </div>
           )}
